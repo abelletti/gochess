@@ -1,8 +1,8 @@
 package main
 
 import (
-	// "fmt"
-	// "strings"
+// "fmt"
+// "strings"
 )
 
 type Piece uint8
@@ -22,7 +22,7 @@ const (
 	White
 )
 
-var piece = [][]rune {
+var piece = [][]rune{
 	[]rune("   "),
 	[]rune("P♙♟"),
 	[]rune("N♘♞"),
@@ -32,17 +32,17 @@ var piece = [][]rune {
 	[]rune("K♔♚"),
 }
 
-func Color( color Piece ) string {
-    color &= White
-    if color == Black {
-        return "Black"
-    } else {
-        return "White"
-    }
+func Color(color Piece) string {
+	color &= White
+	if color == Black {
+		return "Black"
+	} else {
+		return "White"
+	}
 }
 
-func (p *Piece) Set( color, kind Piece ) {
-    *p = color | kind
+func (p *Piece) Set(color, kind Piece) {
+	*p = color | kind
 }
 
 func (p *Piece) Name() string {
@@ -50,17 +50,17 @@ func (p *Piece) Name() string {
 	kind := *p & ^White
 
 	if color == White {
-        return string(piece[kind][2:3])
+		return string(piece[kind][2:3])
 	} else {
-        return string(piece[kind][1:2])
+		return string(piece[kind][1:2])
 		//return strings.ToLower(piece[kind])
 	}
 }
 
 func (p *Piece) isEmpty() bool {
-    return (*p == 0)
+	return (*p == 0)
 }
 
 func (p *Piece) isColor(col Piece) bool {
-    return ((*p & White) == (col & White)) && !p.isEmpty()
+	return ((*p & White) == (col & White)) && !p.isEmpty()
 }

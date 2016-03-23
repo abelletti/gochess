@@ -47,11 +47,14 @@ func (b *Board) Show() {
 }
 
 func (b *Board) isEmpty(rank, file int) bool {
-    return b[rank][file].isEmpty()
+	return b[rank][file].isEmpty()
 }
 
 func (b *Board) isColor(rank int, file int, color Piece) bool {
-    return b[rank][file].isColor(color)
+	return b[rank][file].isColor(color)
 }
 
-
+func (b *Board) CandidateMoves(side Piece) Movelist {
+    movelist := make(Movelist, 0)
+    return movelist
+}
