@@ -1,9 +1,10 @@
 package main
 
 import "fmt"
+import "strconv"
 
 /*
- * Board array is row, col with 0,0 at bottom-left
+ * Board array is rank, file with 0,0 at bottom-left
  * White at bottom, black at top
  */
 
@@ -27,32 +28,30 @@ func (b *Board) Init() {
 	b[7][6].Set(Black, Knight)
 	b[7][7].Set(Black, Rook)
 
-	for col := 0; col < 8; col++ {
-		b[1][col].Set(White, Pawn)
-		b[6][col].Set(Black, Pawn)
+	for file := 0; file < 8; file++ {
+		b[1][file].Set(White, Pawn)
+		b[6][file].Set(Black, Pawn)
 	}
 }
 
 func (b *Board) Show() {
-	for row := 7; row >= 0; row-- {
-		letter := make([]byte, 1)
-		letter[0] = byte('a') + byte(row)
-		line := string(letter[0:1]) + "|"
-		for col := 0; col < 8; col++ {
-			line += " " + b[row][col].Name() + " "
+	for rank := 7; rank >= 0; rank-- {
+		line := strconv.Itoa(rank+1) + "|"
+		for file := 0; file < 8; file++ {
+			line += " " + b[rank][file].Name() + " "
 		}
 		fmt.Println(line)
 	}
 	fmt.Println("  -----------------------")
-	fmt.Println("   1  2  3  4  5  6  7  8")
+	fmt.Println("   a  b  c  d  e  f  g  h")
 }
 
-func (b *Board) isEmpty(row, col int) bool {
-    return b[row][col].isEmpty()
+func (b *Board) isEmpty(rank, file int) bool {
+    return b[rank][file].isEmpty()
 }
 
-func (b *Board) isColor(row int, col int, color Piece) bool {
-    return b[row][col].isColor(color)
+func (b *Board) isColor(rank int, file int, color Piece) bool {
+    return b[rank][file].isColor(color)
 }
 
 
