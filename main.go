@@ -25,7 +25,14 @@ func main() {
     pos2.Sets("f2")
     fmt.Println( pos1.Name(), pos2.Name() )
 
-    var move1 Move
+    var move1, move2 Move
     move1.Sets( "b1", "a3" )
+    move2.Sets( "a2", "a3" )
     fmt.Println( move1.Name() )
+    fmt.Println( move2.Name() )
+
+    movelist := make( Movelist,0 )
+    movelist.Add( move1 )
+    movelist.Add( move2 )
+    movelist.Show()
 }
