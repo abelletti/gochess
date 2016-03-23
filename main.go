@@ -24,4 +24,8 @@ func main() {
     pos1.Set(2,4)
     pos2.Sets("f2")
     fmt.Println( pos1.Name(), pos2.Name() )
+
+    var move1 Move
+    move1.Sets( "b1", "a3" )
+    fmt.Println( move1.Name() )
 }
