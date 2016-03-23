@@ -12,3 +12,6 @@ Generate list of candidate moves
 What does a move list look like?
 Could store moves per piece in which case only destination is needed
 But maybe simpler to list src (rank,file) -> dest (rank,file)
+Move type
+Movelist type
+

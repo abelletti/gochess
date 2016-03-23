@@ -32,6 +32,15 @@ var piece = [][]rune {
 	[]rune("K♔♚"),
 }
 
+func Color( color Piece ) string {
+    color &= White
+    if color == Black {
+        return "Black"
+    } else {
+        return "White"
+    }
+}
+
 func (p *Piece) Set( color, kind Piece ) {
     *p = color | kind
 }
