@@ -2,7 +2,7 @@ package main
 
 import (
 	// "fmt"
-	"strings"
+	// "strings"
 )
 
 type Piece uint8
@@ -22,14 +22,14 @@ const (
 	White
 )
 
-var piece = []string {
-	" ",
-	"P",
-	"N",
-	"B",
-	"R",
-	"Q",
-	"K",
+var piece = [][]rune {
+	[]rune("   "),
+	[]rune("P♙♟"),
+	[]rune("N♘♞"),
+	[]rune("B♗♝"),
+	[]rune("R♖♜"),
+	[]rune("Q♕♛"),
+	[]rune("K♔♚"),
 }
 
 func (p *Piece) Set( color, kind Piece ) {
@@ -41,9 +41,10 @@ func (p *Piece) Name() string {
 	kind := *p & ^White
 
 	if color == White {
-		return piece[kind]
+        return string(piece[kind][2:3])
 	} else {
-		return strings.ToLower(piece[kind])
+        return string(piece[kind][1:2])
+		//return strings.ToLower(piece[kind])
 	}
 }
 
