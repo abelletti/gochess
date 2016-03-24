@@ -24,16 +24,20 @@ func main() {
 		fmt.Println()
         incheck := board.isCheck(side)
         if incheck {
-            fmt.Printf("Oh god help me, I'm in CHECK!")
+            fmt.Println("Oh god help me, I'm in CHECK!")
         }
 		moves := board.CandidateMoves(side)
 		if len(moves) == 0 {
-			fmt.Println(side.Color() + " has no moves remaining!")
+			fmt.Println(side.Color() + " has no moves remaining, STALEMATE?")
 			break
 		}
 		moves.Show("Candidate Moves for " + side.Color())
         moves = moves.PruneForCheck(&board,side)
 		moves.Show("Pruned Candidate Moves for " + side.Color())
+        if len(moves)==0 && incheck {
+            fmt.Println(side.Color() + " has no moves to exit CHECK; CHECKMATE!")
+            break
+        }
 		chosenmove := moves.Choose(side)
 		fmt.Println("Chosen move: " + chosenmove.Name())
 		board.Apply(chosenmove)

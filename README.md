@@ -6,6 +6,4 @@ Next steps:
 Generate list of candidate moves
 (filter by moving into check -- or defer until elsewhere?)
 
-Implement checking for Check
-Implement checking for checkmate
 
