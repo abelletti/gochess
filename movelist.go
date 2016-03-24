@@ -18,6 +18,31 @@ func (ml *Movelist) Show(title string) {
 	fmt.Println()
 }
 
+func (ml *Movelist) landsOn(pos Position) bool {
+    for movenum := range (*ml) {
+        if pos == (*ml)[movenum].getTo() {
+            return true
+        }
+    }
+    return false
+}
+
+func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
+    var newmoves Movelist
+
+    for movenum := range (*ml) {
+        move := (*ml)[movenum]
+        newb := b.ApplyNew(move)
+        if !newb.isCheck(side) {
+            newmoves.Add(move)
+        } else {
+            fmt.Println("Would be moving into CHECK: "+move.Name())
+        }
+    }
+
+    return newmoves
+}
+
 func (ml *Movelist) Add(m Move) {
 	*ml = append(*ml, m)
 }
@@ -38,3 +63,4 @@ func (ml *Movelist) Choose(side Piece) Move {
 	pick := rand.Intn(len(*ml))
 	return (*ml)[pick]
 }
+

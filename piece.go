@@ -53,10 +53,10 @@ var movefunc = map[Piece]GetMovesFunc{
 type MoveDesc struct {
 	rankstep  int
 	filestep  int
-	repeating bool
+	longmove bool
 }
 
-var knightmoves = []MoveDesc{
+var knightmoves = []MoveDesc {
 	{2, -1, false},
 	{2, 1, false},
 	{1, 2, false},
@@ -65,6 +65,33 @@ var knightmoves = []MoveDesc{
 	{-2, -1, false},
 	{-1, -2, false},
 	{1, -2, false},
+}
+
+var bishopmoves = []MoveDesc {
+    {1, 1, true},
+    {-1, 1, true},
+    {-1, -1, true},
+    {1, -1, true},
+}
+
+var rookmoves = []MoveDesc {
+    {1, 0, true},
+    {0, 1, true},
+    {-1, 0, true},
+    {0, -1, true},
+}
+
+var queenmoves = append(bishopmoves, rookmoves...)
+
+var kingmoves = []MoveDesc {
+    {1, 0, false},
+    {1, 1, false},
+    {0, 1, false},
+    {-1, 1, false},
+    {-1, 0, false},
+    {-1, -1, false},
+    {0, -1, false},
+    {1, -1, false},
 }
 
 func (p *Piece) Color() string {
@@ -150,7 +177,7 @@ func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
 	// two steps forward, only from starting position
 	lookr = rank + 2*direction
 	if (side == White && rank == 1) || (side == Black && rank == 6) {
-		if isValid(lookr, file) && b.isEmpty(lookr, file) {
+		if isValid(lookr, file) && b.isEmpty(lookr, file) && b.isEmpty(lookr-direction, file) {
 			to.Set(lookr, file)
 			moves.AddPair(from, to)
 		}
@@ -199,17 +226,42 @@ func GetKnightMoves(b *Board, side Piece, rank, file int) *Movelist {
 }
 
 func GetBishopMoves(b *Board, side Piece, rank, file int) *Movelist {
-	return nil
+    return GetLongMoves(b, side, rank, file, bishopmoves)
 }
 
 func GetRookMoves(b *Board, side Piece, rank, file int) *Movelist {
-	return nil
+    return GetLongMoves(b, side, rank, file, rookmoves)
 }
 
 func GetQueenMoves(b *Board, side Piece, rank, file int) *Movelist {
-	return nil
+    return GetLongMoves(b, side, rank, file, queenmoves)
 }
 
 func GetKingMoves(b *Board, side Piece, rank, file int) *Movelist {
-	return nil
+    return GetLongMoves(b, side, rank, file, kingmoves)
 }
+
+func GetLongMoves(b *Board, side Piece, rank, file int, movestyle []MoveDesc) *Movelist {
+	moves := make(Movelist, 0)
+	var to, from Position
+	var lookr, lookf int
+
+	from.Set(rank, file)
+
+	for _, movedesc := range movestyle {
+        for distance := 1; distance <= 7; distance++ {
+		    lookr = rank + movedesc.rankstep * distance
+		    lookf = file + movedesc.filestep * distance
+		    if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr, lookf)) {
+			    to.Set(lookr, lookf)
+			    moves.AddPair(from, to)
+		    }
+            if !isValid(lookr, lookf) || !b.isEmpty(lookr, lookf) || !movedesc.longmove {
+                break
+            }
+        }
+	}
+
+	return &moves
+}
+

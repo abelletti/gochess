@@ -84,6 +84,24 @@ func (b *Board) isEnemy(rank int, file int, color Piece) bool {
 	return b[rank][file].isColor(color ^ ColorMask)
 }
 
+func (b *Board) ApplyNew(m Move) *Board {
+	from := m.getFrom()
+	to := m.getTo()
+    newb := *b
+
+	piece := newb.GetPos(from)
+	//var capture Piece = Empty
+	//if !newb.isEmptyPos(to) {
+		// add logic to record captured pieces
+		//capture = *(newb.GetPos(to))
+		//fmt.Println(piece.Color() + " would capture: " + (&capture).Name())
+	//}
+	newb.SetPos(to, *piece)
+	*piece = Empty
+
+    return &newb
+}
+
 func (b *Board) Apply(m Move) {
 	from := m.getFrom()
 	to := m.getTo()
@@ -113,4 +131,30 @@ func (b *Board) CandidateMoves(side Piece) Movelist {
 	}
 
 	return movelist
+}
+
+func (b *Board) isCheck(side Piece) bool {
+    king := b.findKing(side)
+    opponent := side ^ ColorMask
+    //fmt.Println( "Found " + side.Color() + " king at " + king.Name())
+    moves := b.CandidateMoves(opponent)
+    return moves.landsOn(king) 
+}
+
+func (b *Board) findKing(side Piece) Position {
+    var pos Position
+    var p Piece
+    p.Set(side, King)
+
+	for rank := 0; rank < 8; rank++ {
+		for file := 0; file < 8; file++ {
+            if (*b)[rank][file] == p {
+                pos.Set(rank, file)
+                return pos
+            }
+        }
+    }
+
+    err := "Failed to find " + side.Color() + " king!"
+    panic(err)
 }
