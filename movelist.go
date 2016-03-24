@@ -20,7 +20,14 @@ func (ml *Movelist) Add(m Move) {
 	*ml = append(*ml, m)
 }
 
+func (ml *Movelist) AddPair(to, from Position) {
+    var move Move
+    move.Set(to, from)
+	*ml = append(*ml, move)
+}
 
 func (ml *Movelist) AddList(ml2 *Movelist) {
-	*ml = append(*ml, *ml2...)
+    if ml2 != nil {
+	    *ml = append(*ml, *ml2...)
+    }
 }

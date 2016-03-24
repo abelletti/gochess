@@ -13,6 +13,7 @@ func main() {
 	board.Show()
 	fmt.Println()
 
+    /*
 	fmt.Println(board.isEmpty(0, 0))
 	fmt.Println(board.isEmpty(4, 0))
 	fmt.Println(board.isColor(0, 0, White))
@@ -37,7 +38,8 @@ func main() {
 	movelist.Show("")
     movelist.AddList(&movelist)
     movelist.Show("Doubled")
+    */
 
-    movelist = board.CandidateMoves(side)
-    movelist.Show("Candidate Moves for "+Color(side) )
+    moves := board.CandidateMoves(side)
+    moves.Show("Candidate Moves for "+Color(side) )
 }

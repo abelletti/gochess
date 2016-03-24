@@ -34,6 +34,10 @@ func (b *Board) Init() {
 	}
 }
 
+func (b *Board) Get(rank, file int) *Piece {
+    return &b[rank][file]
+}
+
 func (b *Board) Show() {
 	for rank := 7; rank >= 0; rank-- {
 		line := strconv.Itoa(rank+1) + "|"
@@ -50,11 +54,30 @@ func (b *Board) isEmpty(rank, file int) bool {
 	return b[rank][file].isEmpty()
 }
 
+func isValid( rank, file int) bool {
+    return !(rank < 0 || rank > 7 || file < 0 || file > 7)
+}
+
 func (b *Board) isColor(rank int, file int, color Piece) bool {
 	return b[rank][file].isColor(color)
 }
 
+func (b *Board) isEnemy(rank int, file int, color Piece) bool {
+	return b[rank][file].isColor(color ^ ColorMask)
+}
+
 func (b *Board) CandidateMoves(side Piece) Movelist {
     movelist := make(Movelist, 0)
+
+    for rank := 0; rank < 8; rank++ {
+        for file := 0; file <8; file++ {
+            if b.Get(rank, file).isColor(side) {
+                piece := *b.Get(rank, file)
+                fmt.Println( "found: " + piece.Name() + " at " + PosName(rank, file) )
+                movelist.AddList(piece.GetMoves(b, rank, file))
+            }
+        }
+    }
+
     return movelist
 }

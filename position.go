@@ -24,3 +24,9 @@ func (p *Position) Set(rank, file int) {
 func (p *Position) Name() string {
 	return fmt.Sprintf("%c%d", int('a')+int(p.file), p.rank+1)
 }
+
+func PosName(rank, file int) string {
+    var p Position
+    p.Set(rank, file)
+    return p.Name()
+}
