@@ -22,6 +22,10 @@ func main() {
 		fmt.Printf("\nPrior to Turn #%d (%s's move):\n\n", turn, side.Color())
 		board.Show()
 		fmt.Println()
+        incheck := board.isCheck(side)
+        if incheck {
+            fmt.Printf("Oh god help me, I'm in CHECK!")
+        }
 		moves := board.CandidateMoves(side)
 		if len(moves) == 0 {
 			fmt.Println(side.Color() + " has no moves remaining!")
