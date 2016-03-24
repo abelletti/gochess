@@ -1,9 +1,11 @@
 package main
 
 import (
-//    "fmt"
+    "fmt"
     "strconv"
 )
+
+var _ = fmt.Printf
 
 type Piece uint8
 
@@ -46,6 +48,23 @@ var movefunc = map[Piece]GetMovesFunc {
     Rook : GetRookMoves,
     Queen : GetQueenMoves,
     King : GetKingMoves,
+}
+
+type MoveDesc struct {
+    rankstep int
+    filestep int
+    repeating bool
+}
+
+var knightmoves = []MoveDesc {
+    {2,-1,false},
+    {2,1,false},
+    {1,2,false},
+    {-1,2,false},
+    {-2,1,false},
+    {-2,-1,false},
+    {-1,-2,false},
+    {1,-2,false},
 }
 
 func (p *Piece) Color() string {
@@ -162,7 +181,22 @@ func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
 
 func GetKnightMoves(b *Board, side Piece, rank, file int) *Movelist {
 //    fmt.Println("GetKnightMoves")
-    return nil
+    moves := make(Movelist, 0)
+    var to, from Position
+    var lookr, lookf int
+
+    from.Set(rank, file)
+
+    for _, movedesc := range knightmoves {
+        lookr = rank+movedesc.rankstep
+        lookf = file+movedesc.filestep
+        if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr,lookf)) {
+            to.Set(lookr, lookf)
+            moves.AddPair(from, to)
+        }
+    }
+
+    return &moves
 }
 
 func GetBishopMoves(b *Board, side Piece, rank, file int) *Movelist {
