@@ -26,11 +26,11 @@ func (p *Position) Name() string {
 }
 
 func PosName(rank, file int) string {
-    var p Position
-    p.Set(rank, file)
-    return p.Name()
+	var p Position
+	p.Set(rank, file)
+	return p.Name()
 }
 
 func (p *Position) getRankFile() (int, int) {
-    return int(p.rank), int(p.file)
+	return int(p.rank), int(p.file)
 }

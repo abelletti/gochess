@@ -22,9 +22,9 @@ func (m *Move) Name() string {
 }
 
 func (m *Move) getFrom() Position {
-    return m.from
+	return m.from
 }
 
 func (m *Move) getTo() Position {
-    return m.to
+	return m.to
 }

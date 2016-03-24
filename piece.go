@@ -1,8 +1,8 @@
 package main
 
 import (
-    "fmt"
-    "strconv"
+	"fmt"
+	"strconv"
 )
 
 var _ = fmt.Printf
@@ -20,8 +20,8 @@ const (
 )
 
 const (
-    KindMask = 0x07
-    ColorMask = 0x80
+	KindMask  = 0x07
+	ColorMask = 0x80
 )
 
 const (
@@ -41,34 +41,34 @@ var piece = [][]rune{
 
 type GetMovesFunc func(*Board, Piece, int, int) *Movelist
 
-var movefunc = map[Piece]GetMovesFunc {
-    Pawn : GetPawnMoves,
-    Knight : GetKnightMoves,
-    Bishop : GetBishopMoves,
-    Rook : GetRookMoves,
-    Queen : GetQueenMoves,
-    King : GetKingMoves,
+var movefunc = map[Piece]GetMovesFunc{
+	Pawn:   GetPawnMoves,
+	Knight: GetKnightMoves,
+	Bishop: GetBishopMoves,
+	Rook:   GetRookMoves,
+	Queen:  GetQueenMoves,
+	King:   GetKingMoves,
 }
 
 type MoveDesc struct {
-    rankstep int
-    filestep int
-    repeating bool
+	rankstep  int
+	filestep  int
+	repeating bool
 }
 
-var knightmoves = []MoveDesc {
-    {2,-1,false},
-    {2,1,false},
-    {1,2,false},
-    {-1,2,false},
-    {-2,1,false},
-    {-2,-1,false},
-    {-1,-2,false},
-    {1,-2,false},
+var knightmoves = []MoveDesc{
+	{2, -1, false},
+	{2, 1, false},
+	{1, 2, false},
+	{-1, 2, false},
+	{-2, 1, false},
+	{-2, -1, false},
+	{-1, -2, false},
+	{1, -2, false},
 }
 
 func (p *Piece) Color() string {
-    color := *p & ColorMask
+	color := *p & ColorMask
 	if color == Black {
 		return "Black"
 	} else {
@@ -101,116 +101,115 @@ func (p *Piece) isColor(col Piece) bool {
 }
 
 func (p *Piece) GetMoves(b *Board, rank, file int) *Movelist {
-    kind := *p & KindMask
-    side := *p & ColorMask
+	kind := *p & KindMask
+	side := *p & ColorMask
 
-    switch kind {
-    case Empty:
-        panic( "Listing moves for an empty piece doesn't even make sense!" )
-    case Pawn:
-        return GetPawnMoves(b, side, rank, file)
-    case Knight:
-        return GetKnightMoves(b, side, rank, file)
-    case Bishop:
-        return GetBishopMoves(b, side, rank, file)
-    case Rook:
-        return GetRookMoves(b, side, rank, file)
-    case Queen:
-        return GetQueenMoves(b, side, rank, file)
-    case King:
-        return GetKingMoves(b, side, rank, file)
-    default:
-        err := "Encountered unknown piece, value = " + strconv.Itoa(int(kind))
-        panic(err)
-    }
+	switch kind {
+	case Empty:
+		panic("Listing moves for an empty piece doesn't even make sense!")
+	case Pawn:
+		return GetPawnMoves(b, side, rank, file)
+	case Knight:
+		return GetKnightMoves(b, side, rank, file)
+	case Bishop:
+		return GetBishopMoves(b, side, rank, file)
+	case Rook:
+		return GetRookMoves(b, side, rank, file)
+	case Queen:
+		return GetQueenMoves(b, side, rank, file)
+	case King:
+		return GetKingMoves(b, side, rank, file)
+	default:
+		err := "Encountered unknown piece, value = " + strconv.Itoa(int(kind))
+		panic(err)
+	}
 }
 
-
 func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
-//    fmt.Println("GetPawnMoves")
-    moves := make(Movelist, 0)
-    var to, from Position
-    var direction int
-    var lookr, lookf int
+	//    fmt.Println("GetPawnMoves")
+	moves := make(Movelist, 0)
+	var to, from Position
+	var direction int
+	var lookr, lookf int
 
-    from.Set(rank, file)
+	from.Set(rank, file)
 
-    if side == White {
-        direction = 1
-    } else {
-        direction = -1
-    }
+	if side == White {
+		direction = 1
+	} else {
+		direction = -1
+	}
 
-    // single step forward
-    lookr = rank+direction
-    if isValid(lookr, file) && b.isEmpty(lookr, file) {
-        to.Set(lookr, file)
-        moves.AddPair(from, to)
-    }
+	// single step forward
+	lookr = rank + direction
+	if isValid(lookr, file) && b.isEmpty(lookr, file) {
+		to.Set(lookr, file)
+		moves.AddPair(from, to)
+	}
 
-    // two steps forward, only from starting position
-    lookr = rank+2*direction
-    if (side == White && rank == 1) || (side == Black && rank == 6) {
-        if isValid(lookr, file) && b.isEmpty(lookr, file) {
-            to.Set(lookr, file)
-            moves.AddPair(from, to)
-        }
-    }
+	// two steps forward, only from starting position
+	lookr = rank + 2*direction
+	if (side == White && rank == 1) || (side == Black && rank == 6) {
+		if isValid(lookr, file) && b.isEmpty(lookr, file) {
+			to.Set(lookr, file)
+			moves.AddPair(from, to)
+		}
+	}
 
-    // capture to the left
-    lookr = rank+direction
-    lookf = file-direction
-    if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
-        to.Set(lookr, lookf)
-        moves.AddPair(from, to)
-    }
+	// capture to the left
+	lookr = rank + direction
+	lookf = file - direction
+	if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
+		to.Set(lookr, lookf)
+		moves.AddPair(from, to)
+	}
 
-    // capture to the right
-    lookr = rank+direction
-    lookf = file+direction
-    if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
-        to.Set(lookr, lookf)
-        moves.AddPair(from, to)
-    }
+	// capture to the right
+	lookr = rank + direction
+	lookf = file + direction
+	if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
+		to.Set(lookr, lookf)
+		moves.AddPair(from, to)
+	}
 
-    // en passant to the left
-    // en passant to the right
+	// en passant to the left
+	// en passant to the right
 
-    return &moves
+	return &moves
 }
 
 func GetKnightMoves(b *Board, side Piece, rank, file int) *Movelist {
-//    fmt.Println("GetKnightMoves")
-    moves := make(Movelist, 0)
-    var to, from Position
-    var lookr, lookf int
+	//    fmt.Println("GetKnightMoves")
+	moves := make(Movelist, 0)
+	var to, from Position
+	var lookr, lookf int
 
-    from.Set(rank, file)
+	from.Set(rank, file)
 
-    for _, movedesc := range knightmoves {
-        lookr = rank+movedesc.rankstep
-        lookf = file+movedesc.filestep
-        if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr,lookf)) {
-            to.Set(lookr, lookf)
-            moves.AddPair(from, to)
-        }
-    }
+	for _, movedesc := range knightmoves {
+		lookr = rank + movedesc.rankstep
+		lookf = file + movedesc.filestep
+		if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr, lookf)) {
+			to.Set(lookr, lookf)
+			moves.AddPair(from, to)
+		}
+	}
 
-    return &moves
+	return &moves
 }
 
 func GetBishopMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return nil
+	return nil
 }
 
 func GetRookMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return nil
+	return nil
 }
 
 func GetQueenMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return nil
+	return nil
 }
 
 func GetKingMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return nil
+	return nil
 }
