@@ -11,27 +11,27 @@ import "strconv"
 type Board [8][8]Piece
 
 func (b *Board) Init() {
-	b[0][0].Set(White, Rook)
-	b[0][1].Set(White, Knight)
-	b[0][2].Set(White, Bishop)
-	b[0][3].Set(White, Queen)
-	b[0][4].Set(White, King)
-	b[0][5].Set(White, Bishop)
-	b[0][6].Set(White, Knight)
-	b[0][7].Set(White, Rook)
-	b[7][0].Set(Black, Rook)
-	b[7][1].Set(Black, Knight)
-	b[7][2].Set(Black, Bishop)
-	b[7][3].Set(Black, Queen)
-	b[7][4].Set(Black, King)
-	b[7][5].Set(Black, Bishop)
-	b[7][6].Set(Black, Knight)
-	b[7][7].Set(Black, Rook)
+    b[0][0].Set(White, Rook)
+    b[0][1].Set(White, Knight)
+    b[0][2].Set(White, Bishop)
+    b[0][3].Set(White, Queen)
+    b[0][4].Set(White, King)
+    b[0][5].Set(White, Bishop)
+    b[0][6].Set(White, Knight)
+    b[0][7].Set(White, Rook)
+    b[7][0].Set(Black, Rook)
+    b[7][1].Set(Black, Knight)
+    b[7][2].Set(Black, Bishop)
+    b[7][3].Set(Black, Queen)
+    b[7][4].Set(Black, King)
+    b[7][5].Set(Black, Bishop)
+    b[7][6].Set(Black, Knight)
+    b[7][7].Set(Black, Rook)
 
-	for file := 0; file < 8; file++ {
-		b[1][file].Set(White, Pawn)
-		b[6][file].Set(Black, Pawn)
-	}
+    for file := 0; file < 8; file++ {
+        b[1][file].Set(White, Pawn)
+        b[6][file].Set(Black, Pawn)
+    }
 }
 
 func (b *Board) Set(rank, file int, p Piece) {
@@ -52,20 +52,25 @@ func (b *Board) GetPos(pos Position) *Piece {
     return &b[rank][file]
 }
 
-func (b *Board) Show() {
-	for rank := 7; rank >= 0; rank-- {
-		line := strconv.Itoa(rank+1) + "|"
-		for file := 0; file < 8; file++ {
-			line += " " + b[rank][file].Name() + " "
-		}
-		fmt.Println(line)
-	}
-	fmt.Println("  -----------------------")
-	fmt.Println("   a  b  c  d  e  f  g  h")
+func (b *Board) isEmpty(rank, file int) bool {
+    return b.Get(rank, file).isEmpty()
 }
 
-func (b *Board) isEmpty(rank, file int) bool {
-	return b[rank][file].isEmpty()
+func (b *Board) isEmptyPos(pos Position) bool {
+    return b.GetPos(pos).isEmpty()
+}
+
+
+func (b *Board) Show() {
+    for rank := 7; rank >= 0; rank-- {
+        line := strconv.Itoa(rank+1) + "|"
+        for file := 0; file < 8; file++ {
+            line += " " + b[rank][file].Name() + " "
+        }
+        fmt.Println(line)
+    }
+    fmt.Println("  -----------------------")
+    fmt.Println("   a  b  c  d  e  f  g  h")
 }
 
 func isValid( rank, file int) bool {
@@ -73,19 +78,24 @@ func isValid( rank, file int) bool {
 }
 
 func (b *Board) isColor(rank int, file int, color Piece) bool {
-	return b[rank][file].isColor(color)
+    return b[rank][file].isColor(color)
 }
 
 func (b *Board) isEnemy(rank int, file int, color Piece) bool {
-	return b[rank][file].isColor(color ^ ColorMask)
+    return b[rank][file].isColor(color ^ ColorMask)
 }
 
 func (b *Board) Apply(m Move) {
     from := m.getFrom()
     to := m.getTo()
 
-    // add logic to record captured pieces
     piece := b.GetPos(from)
+    var capture Piece = Empty
+    if !b.isEmptyPos(to) {
+        // add logic to record captured pieces
+        capture = *(b.GetPos(to))
+        fmt.Println(piece.Color()+" has captured: "+(&capture).Name())
+    }
     b.SetPos(to, *piece)
     *piece = Empty
 }
