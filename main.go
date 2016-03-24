@@ -38,20 +38,20 @@ func main() {
             fmt.Println(side.Color() + " has no moves to exit CHECK; CHECKMATE!")
             break
         }
-		chosenmove := moves.Choose(side)
+
+        var chosenmove Move
+
+        if side == White {
+		    chosenmove = moves.ChooseRandom(side)
+        } else { // Black's move
+            chosenmove = moves.ChooseFirst(side)
+        }
+
 		fmt.Println("Chosen move: " + chosenmove.Name())
 		board.Apply(chosenmove)
 		fmt.Printf("\nAfter Turn #%d (%s's move):\n\n", turn, side.Color())
 		board.Show()
 		fmt.Println()
-
-        if board.isCheck(side) {
-            fmt.Println( side.Color() + " is in CHECK!")
-        }
-        opponent := side ^ ColorMask
-        if board.isCheck(opponent) {
-            fmt.Println( opponent.Color() + " is in CHECK!")
-        }
 
 		side ^= ColorMask
         turn++

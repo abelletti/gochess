@@ -36,7 +36,7 @@ func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
         if !newb.isCheck(side) {
             newmoves.Add(move)
         } else {
-            fmt.Println("Would be moving into CHECK: "+move.Name())
+            //fmt.Println("Would be moving into CHECK: "+move.Name())
         }
     }
 
@@ -59,8 +59,12 @@ func (ml *Movelist) AddList(ml2 *Movelist) {
 	}
 }
 
-func (ml *Movelist) Choose(side Piece) Move {
+func (ml *Movelist) ChooseRandom(side Piece) Move {
 	pick := rand.Intn(len(*ml))
 	return (*ml)[pick]
 }
 
+func (ml *Movelist) ChooseFirst(side Piece) Move {
+	pick := 0
+	return (*ml)[pick]
+}

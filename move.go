@@ -5,6 +5,7 @@ import "fmt"
 type Move struct {
 	from Position
 	to   Position
+    value int
 }
 
 func (m *Move) Sets(from, to string) {
