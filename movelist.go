@@ -13,8 +13,9 @@ func (ml *Movelist) Show(title string) {
         fmt.Println(title+"\n"+strings.Repeat("-", len(title)))
     }
 	for i := range *ml {
-		fmt.Println([]Move(*ml)[i].Name())
+		fmt.Print([]Move(*ml)[i].Name()+" ")
 	}
+    fmt.Println()
 }
 
 func (ml *Movelist) Add(m Move) {

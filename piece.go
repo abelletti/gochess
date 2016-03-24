@@ -48,8 +48,8 @@ var movefunc = map[Piece]GetMovesFunc {
     King : GetKingMoves,
 }
 
-func Color(color Piece) string {
-	color &= White
+func (p *Piece) Color() string {
+    color := *p & ColorMask
 	if color == Black {
 		return "Black"
 	} else {
@@ -140,7 +140,7 @@ func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
 
     // capture to the left
     lookr = rank+direction
-    lookf = rank-direction
+    lookf = file-direction
     if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
         to.Set(lookr, lookf)
         moves.AddPair(from, to)
@@ -148,7 +148,7 @@ func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
 
     // capture to the right
     lookr = rank+direction
-    lookf = rank+direction
+    lookf = file+direction
     if isValid(lookr, lookf) && b.isEnemy(lookr, lookf, side) {
         to.Set(lookr, lookf)
         moves.AddPair(from, to)
