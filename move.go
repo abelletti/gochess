@@ -20,3 +20,11 @@ func (m *Move) Set(from, to Position) {
 func (m *Move) Name() string {
 	return fmt.Sprintf("%s-%s", m.from.Name(), m.to.Name())
 }
+
+func (m *Move) getFrom() Position {
+    return m.from
+}
+
+func (m *Move) getTo() Position {
+    return m.to
+}

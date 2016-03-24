@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "math/rand"
     "strings"
 )
 
@@ -30,4 +31,9 @@ func (ml *Movelist) AddList(ml2 *Movelist) {
     if ml2 != nil {
 	    *ml = append(*ml, *ml2...)
     }
+}
+
+func (ml *Movelist) Choose(side Piece) Move {
+    pick := rand.Intn(len(*ml))
+    return (*ml)[pick]
 }

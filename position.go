@@ -30,3 +30,7 @@ func PosName(rank, file int) string {
     p.Set(rank, file)
     return p.Name()
 }
+
+func (p *Position) getRankFile() (int, int) {
+    return int(p.rank), int(p.file)
+}

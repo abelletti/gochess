@@ -1,7 +1,7 @@
 package main
 
 import (
-    "fmt"
+//    "fmt"
     "strconv"
 )
 
@@ -108,7 +108,7 @@ func (p *Piece) GetMoves(b *Board, rank, file int) *Movelist {
 
 
 func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
-    fmt.Println("GetPawnMoves")
+//    fmt.Println("GetPawnMoves")
     moves := make(Movelist, 0)
     var to, from Position
     var direction int
@@ -161,7 +161,7 @@ func GetPawnMoves(b *Board, side Piece, rank, file int) *Movelist {
 }
 
 func GetKnightMoves(b *Board, side Piece, rank, file int) *Movelist {
-    fmt.Println("GetKnightMoves")
+//    fmt.Println("GetKnightMoves")
     return nil
 }
 

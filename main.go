@@ -2,11 +2,17 @@ package main
 
 import (
 	"fmt"
+    "math/rand"
+    "time"
 )
 
 func main() {
 	var board Board
 	turn, side := 1, White
+
+    seed := time.Now().UnixNano()
+    fmt.Printf("Random number seed is %d\n", seed)
+    rand.Seed(seed)
 
 	board.Init()
 	fmt.Printf("\nPrior to Turn #%d (%s's move):\n\n", turn, Color(side))
@@ -42,4 +48,10 @@ func main() {
 
     moves := board.CandidateMoves(side)
     moves.Show("Candidate Moves for "+Color(side) )
+    chosenmove := moves.Choose(side)
+    fmt.Println("Chosen move: " + chosenmove.Name())
+    board.Apply(chosenmove)
+	fmt.Printf("\nAfter Turn #%d (%s's move):\n\n", turn, Color(side))
+	board.Show()
+	fmt.Println()
 }

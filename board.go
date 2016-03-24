@@ -34,7 +34,21 @@ func (b *Board) Init() {
 	}
 }
 
+func (b *Board) Set(rank, file int, p Piece) {
+    (*b)[rank][file] = p
+}
+
+func (b *Board) SetPos(pos Position, p Piece) {
+    rank, file := pos.getRankFile()
+    (*b)[rank][file] = p
+}
+
 func (b *Board) Get(rank, file int) *Piece {
+    return &b[rank][file]
+}
+
+func (b *Board) GetPos(pos Position) *Piece {
+    rank, file := pos.getRankFile()
     return &b[rank][file]
 }
 
@@ -66,6 +80,16 @@ func (b *Board) isEnemy(rank int, file int, color Piece) bool {
 	return b[rank][file].isColor(color ^ ColorMask)
 }
 
+func (b *Board) Apply(m Move) {
+    from := m.getFrom()
+    to := m.getTo()
+
+    // add logic to record captured pieces
+    piece := b.GetPos(from)
+    b.SetPos(to, *piece)
+    *piece = Empty
+}
+
 func (b *Board) CandidateMoves(side Piece) Movelist {
     movelist := make(Movelist, 0)
 
@@ -73,7 +97,7 @@ func (b *Board) CandidateMoves(side Piece) Movelist {
         for file := 0; file <8; file++ {
             if b.Get(rank, file).isColor(side) {
                 piece := *b.Get(rank, file)
-                fmt.Println( "found: " + piece.Name() + " at " + PosName(rank, file) )
+                //fmt.Println( "found: " + piece.Name() + " at " + PosName(rank, file) )
                 movelist.AddList(piece.GetMoves(b, rank, file))
             }
         }
