@@ -24,6 +24,23 @@ func (ml *Movelist) landsOn(pos Position) bool {
 	return false
 }
 
+func (ml *Movelist) PruneForSelfCheck(b *Board, side Piece) Movelist {
+	var newmoves Movelist
+
+	for movenum := range *ml {
+		move := (*ml)[movenum]
+		newb, capvalue := b.ApplyNew(move)
+		if !newb.isCheck(side) {
+			move.setScore(capvalue)
+			newmoves.Add(move)
+		} else {
+			//fmt.Println("Would be moving into CHECK: "+move.Name())
+		}
+	}
+
+	return newmoves
+}
+
 func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
 	var newmoves Movelist
 
@@ -31,15 +48,15 @@ func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
 		move := (*ml)[movenum]
 		newb, capvalue := b.ApplyNew(move)
 		if !newb.isCheck(side) {
-            if newb.isCheckMate(*(side.Other())) {
-                capvalue = 1000000
-                move.setScore(capvalue)
-                var matemoves Movelist
-                matemoves.Add(move)
-                return matemoves;  // not much point in alteratives, this is mate
-            }
-            move.setScore(capvalue)
-            newmoves.Add(move)
+			if newb.isCheckMate(*(side.Other())) {
+				capvalue = 1000000
+				move.setScore(capvalue)
+				var matemoves Movelist
+				matemoves.Add(move)
+				return matemoves // not much point in alteratives, this is mate
+			}
+			move.setScore(capvalue)
+			newmoves.Add(move)
 		} else {
 			//fmt.Println("Would be moving into CHECK: "+move.Name())
 		}
@@ -77,23 +94,23 @@ func (ml *Movelist) ChooseFirst(side Piece) Move {
 func (ml *Movelist) ChooseNoDepth(side Piece) Move {
 	var topscore int
 
-    // identify score of top move(s)
-    for movenum := range *ml {
-        movescore := (*ml)[movenum].getScore()
-        if movescore > topscore {
-            topscore = movescore
-        }
-    }
+	// identify score of top move(s)
+	for movenum := range *ml {
+		movescore := (*ml)[movenum].getScore()
+		if movescore > topscore {
+			topscore = movescore
+		}
+	}
 
-    // and choose randomly from amongst identical scores
-    var choices []int
-    for movenum := range *ml {
-        if (*ml)[movenum].getScore() == topscore {
-            choices = append(choices, movenum)
-        }
-    }
-    pick := choices[rand.Intn(len(choices))]
+	// and choose randomly from amongst identical scores
+	var choices []int
+	for movenum := range *ml {
+		if (*ml)[movenum].getScore() == topscore {
+			choices = append(choices, movenum)
+		}
+	}
+	pick := choices[rand.Intn(len(choices))]
 
-    fmt.Printf("Top scoring move worth %d (%d identical)\n", topscore, len(choices))
+	fmt.Printf("Top scoring move worth %d (%d identical)\n", topscore, len(choices))
 	return (*ml)[pick]
 }

@@ -8,4 +8,7 @@ Openings?
 En passant
 Castling
 
+*** BUG: More than depth 2 seems wrong, probably doing pos/neg incorrectly
+
+
 

@@ -114,13 +114,13 @@ func (p *Piece) Color() string {
 }
 
 func (p *Piece) Other() *Piece {
-    other := *p ^ ColorMask
-    return &other
+	other := *p ^ ColorMask
+	return &other
 }
 
 func (p *Piece) Val() int {
-    kind := *p & KindMask
-    return pieceval[kind]
+	kind := *p & KindMask
+	return pieceval[kind]
 }
 
 func (p *Piece) Set(color, kind Piece) {

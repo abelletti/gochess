@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
-import "strconv"
+import (
+	"fmt"
+	"math/rand"
+	"strconv"
+)
 
 /*
  * Board array is rank, file with 0,0 at bottom-left
@@ -61,22 +64,22 @@ func (b *Board) isEmptyPos(pos Position) bool {
 }
 
 func (b *Board) Show() {
-    b.ShowMarkedbyRankFile(-1, -1)
+	b.ShowMarkedbyRankFile(-1, -1)
 }
 
 func (b *Board) ShowMarked(pos Position) {
-    b.ShowMarkedbyRankFile(pos.getRankFile())
+	b.ShowMarkedbyRankFile(pos.getRankFile())
 }
 
 func (b *Board) ShowMarkedbyRankFile(rankmark, filemark int) {
 	for rank := 7; rank >= 0; rank-- {
 		line := strconv.Itoa(rank+1) + "|"
 		for file := 0; file < 8; file++ {
-            if rank == rankmark && file == filemark {
-                line += ">"
-            } else {
-                line += " "
-            }
+			if rank == rankmark && file == filemark {
+				line += ">"
+			} else {
+				line += " "
+			}
 			line += b[rank][file].Name() + " "
 		}
 		fmt.Println(line)
@@ -101,13 +104,13 @@ func (b *Board) ApplyNew(m Move) (*Board, int) {
 	from := m.getFrom()
 	to := m.getTo()
 	newb := *b
-    var capvalue int
+	var capvalue int
 
 	piece := newb.GetPos(from)
 	if !newb.isEmptyPos(to) {
-        capture := newb.GetPos(to)
-        capvalue = capture.Val()
-	    //fmt.Println(piece.Color() + " would capture: " + capture.Name())
+		capture := newb.GetPos(to)
+		capvalue = capture.Val()
+		//fmt.Println(piece.Color() + " would capture: " + capture.Name())
 	}
 	newb.SetPos(to, *piece)
 	*piece = Empty
@@ -147,16 +150,16 @@ func (b *Board) CandidateMoves(side Piece) Movelist {
 }
 
 func (b *Board) isCheckMate(side Piece) bool {
-    if !b.isCheck(side) {
-        return false
-    }
-    // we're in check; do we have a move?
-    moves := b.CandidateMoves(side)
-    moves.Show("Testing check: Candidate Moves for " + side.Color() + ": ")
-    moves = moves.PruneForCheck(b, side)
-    moves.Show("Testing check: Pruned Candidate Moves for " + side.Color() + ": ")
+	if !b.isCheck(side) {
+		return false
+	}
+	// we're in check; do we have a move?
+	moves := b.CandidateMoves(side)
+	moves.Show("Testing check: Candidate Moves for " + side.Color() + ": ")
+	moves = moves.PruneForCheck(b, side)
+	moves.Show("Testing check: Pruned Candidate Moves for " + side.Color() + ": ")
 
-    return len(moves) == 0
+	return len(moves) == 0
 }
 
 func (b *Board) isCheck(side Piece) bool {
@@ -166,7 +169,6 @@ func (b *Board) isCheck(side Piece) bool {
 	moves := b.CandidateMoves(opponent)
 	return moves.landsOn(king)
 }
-
 
 func (b *Board) findKing(side Piece) Position {
 	var pos Position
@@ -184,4 +186,74 @@ func (b *Board) findKing(side Piece) Position {
 
 	err := "Failed to find " + side.Color() + " king!"
 	panic(err)
+}
+
+func (b *Board) ChooseBestWithDepth(side Piece, depth int, incheck bool) (Move, bool) {
+	return b.ChooseBestWithDepthInner(side, depth, incheck, true)
+}
+
+func (b *Board) ChooseBestWithDepthInner(side Piece, depth int, incheck, myself bool) (Move, bool) {
+	var bestmove Move
+
+	moves := b.CandidateMoves(side) // what legal moves can I make?
+	//  moves.Show("Candidate Moves for " + side.Color() + ": ")
+	moves = moves.PruneForSelfCheck(b, side) // cannot put myself into check, remove those
+	//  at this point, each "moves" entry is marked with a point value
+	//  moves.Show("Pruned Candidate Moves for " + side.Color() + ": ")
+
+	if len(moves) == 0 {
+		if incheck {
+			bestmove.setScore(-1000000)
+			return bestmove, true // checkmate
+		} else {
+			bestmove.setScore(5)
+			return bestmove, true // this way leads stalemate
+		}
+	}
+
+	//  fmt.Printf( "BEFORE: depth = %d, len(moves) = %d\n", depth, len(moves))
+
+	if depth > 1 {
+		// evaluate opponent options for each of our moves
+		for movenum := range moves {
+			newb, _ := b.ApplyNew(moves[movenum])
+			check := newb.isCheck(*(side.Other()))
+			best, _ := newb.ChooseBestWithDepthInner(*(side.Other()), depth-1, check, !myself)
+			//          fmt.Println( "Got back: " + best.NameVal())
+			moves[movenum].addScore(best.getScore())
+			//            if myself {
+			//                // "good" opponent moves are bad for me
+			//                moves[movenum].addScore(-1 * best.getScore())
+			//            } else {
+			//                // but good moves for me are lovely
+			//                moves[movenum].addScore(best.getScore())
+			//            }
+			//          fmt.Printf( "Move score = %d\n", moves[movenum].getScore())
+		}
+	}
+	//  fmt.Printf( "AFTER: depth = %d, len(moves) = %d\n", depth, len(moves))
+
+	// otherwise choose the best of what we've got
+	topscore := -1000000000
+
+	// identify score of top move(s)
+	for movenum := range moves {
+		movescore := moves[movenum].getScore()
+		if movescore > topscore {
+			topscore = movescore
+		}
+	}
+
+	// and choose randomly from amongst identical scores
+	var choices []int
+	for movenum := range moves {
+		if moves[movenum].getScore() == topscore {
+			choices = append(choices, movenum)
+		}
+	}
+	//  fmt.Printf("len(choices) = %d\n", len(choices))
+	pick := choices[rand.Intn(len(choices))]
+
+	//  fmt.Printf("Top scoring move worth %d (%d identical)\n", topscore, len(choices))
+	return moves[pick], false
 }

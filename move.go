@@ -18,12 +18,16 @@ func (m *Move) Set(from, to Position) {
 	m.to = to
 }
 
+func (m *Move) addScore(value int) {
+	m.value += value
+}
+
 func (m *Move) setScore(value int) {
-    m.value = value
+	m.value = value
 }
 
 func (m *Move) getScore() int {
-    return m.value
+	return m.value
 }
 
 func (m *Move) Name() string {
@@ -31,11 +35,11 @@ func (m *Move) Name() string {
 }
 
 func (m *Move) NameVal() string {
-    if m.value != 0 {
-	    return fmt.Sprintf("%s-%s(%d)", m.from.Name(), m.to.Name(), m.value)
-    } else {
-        return m.Name()
-    }
+	if m.value != 0 {
+		return fmt.Sprintf("%s-%s(%d)", m.from.Name(), m.to.Name(), m.value)
+	} else {
+		return m.Name()
+	}
 }
 
 func (m *Move) getFrom() Position {
