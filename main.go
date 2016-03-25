@@ -27,17 +27,13 @@ func main() {
 			fmt.Println("Oh god help me, I'm in CHECK!")
 		}
 		moves := board.CandidateMoves(side)
-		moves.Show("Candidate Moves for " + side.Color())
+        moves.Show("Candidate Moves for " + side.Color() + ": ")
 		moves = moves.PruneForCheck(&board, side)
-		moves.Show("Pruned Candidate Moves for " + side.Color())
+        moves.Show("Pruned Candidate Moves for " + side.Color() + ": ")
+
 		if len(moves) == 0 {
-            if incheck {
-			    fmt.Println(side.Color() + " has no moves to exit check; CHECKMATE!")
-			    break
-            } else {
-			    fmt.Println(side.Color() + " has no moves remaining, STALEMATE!")
-			    break
-            }
+			fmt.Println(side.Color() + " has no moves remaining, STALEMATE!")
+			break
 		}
 
 		var chosenmove Move
@@ -52,12 +48,14 @@ func main() {
 		board.Apply(chosenmove)
 		fmt.Printf("\nAfter Turn #%d (%s's move):\n\n", turn, side.Color())
 		board.ShowMarked(chosenmove.getTo())
-		fmt.Println()
+        if board.isCheckMate(*(side.Other())) {
+            fmt.Println(side.Other().Color() + " is in CHECKMATE!")
+            break
+        }
 
 		side ^= ColorMask
 		turn++
 
 		fmt.Scanln(&line)
 	}
-
 }

@@ -113,6 +113,11 @@ func (p *Piece) Color() string {
 	}
 }
 
+func (p *Piece) Other() *Piece {
+    other := *p ^ ColorMask
+    return &other
+}
+
 func (p *Piece) Val() int {
     kind := *p & KindMask
     return pieceval[kind]

@@ -146,6 +146,19 @@ func (b *Board) CandidateMoves(side Piece) Movelist {
 	return movelist
 }
 
+func (b *Board) isCheckMate(side Piece) bool {
+    if !b.isCheck(side) {
+        return false
+    }
+    // we're in check; do we have a move?
+    moves := b.CandidateMoves(side)
+    moves.Show("Testing check: Candidate Moves for " + side.Color() + ": ")
+    moves = moves.PruneForCheck(b, side)
+    moves.Show("Testing check: Pruned Candidate Moves for " + side.Color() + ": ")
+
+    return len(moves) == 0
+}
+
 func (b *Board) isCheck(side Piece) bool {
 	king := b.findKing(side)
 	opponent := side ^ ColorMask
@@ -153,6 +166,7 @@ func (b *Board) isCheck(side Piece) bool {
 	moves := b.CandidateMoves(opponent)
 	return moves.landsOn(king)
 }
+
 
 func (b *Board) findKing(side Piece) Position {
 	var pos Position

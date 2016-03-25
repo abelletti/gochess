@@ -3,15 +3,12 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"strings"
 )
 
 type Movelist []Move
 
 func (ml *Movelist) Show(title string) {
-	if title != "" {
-		fmt.Println(title + "\n" + strings.Repeat("-", len(title)))
-	}
+	fmt.Print(title)
 	for i := range *ml {
 		fmt.Print([]Move(*ml)[i].NameVal() + " ")
 	}
@@ -34,6 +31,9 @@ func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
 		move := (*ml)[movenum]
 		newb, capvalue := b.ApplyNew(move)
 		if !newb.isCheck(side) {
+            if newb.isCheckMate(*(side.Other())) {
+                capvalue = 1000000
+            }
             move.setScore(capvalue)
             newmoves.Add(move)
 		} else {
