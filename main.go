@@ -22,39 +22,40 @@ func main() {
 		fmt.Printf("\nPrior to Turn #%d (%s's move):\n\n", turn, side.Color())
 		board.Show()
 		fmt.Println()
-        incheck := board.isCheck(side)
-        if incheck {
-            fmt.Println("Oh god help me, I'm in CHECK!")
-        }
-		moves := board.CandidateMoves(side)
-		if len(moves) == 0 {
-			fmt.Println(side.Color() + " has no moves remaining, STALEMATE?")
-			break
+		incheck := board.isCheck(side)
+		if incheck {
+			fmt.Println("Oh god help me, I'm in CHECK!")
 		}
+		moves := board.CandidateMoves(side)
 		moves.Show("Candidate Moves for " + side.Color())
-        moves = moves.PruneForCheck(&board,side)
+		moves = moves.PruneForCheck(&board, side)
 		moves.Show("Pruned Candidate Moves for " + side.Color())
-        if len(moves)==0 && incheck {
-            fmt.Println(side.Color() + " has no moves to exit CHECK; CHECKMATE!")
-            break
-        }
+		if len(moves) == 0 {
+            if incheck {
+			    fmt.Println(side.Color() + " has no moves to exit check; CHECKMATE!")
+			    break
+            } else {
+			    fmt.Println(side.Color() + " has no moves remaining, STALEMATE!")
+			    break
+            }
+		}
 
-        var chosenmove Move
+		var chosenmove Move
 
-        if side == White {
-		    chosenmove = moves.ChooseRandom(side)
-        } else { // Black's move
-            chosenmove = moves.ChooseFirst(side)
-        }
+		if side == White {
+			chosenmove = moves.ChooseRandom(side)
+		} else { // Black's move
+			chosenmove = moves.ChooseNoDepth(side)
+		}
 
 		fmt.Println("Chosen move: " + chosenmove.Name())
 		board.Apply(chosenmove)
 		fmt.Printf("\nAfter Turn #%d (%s's move):\n\n", turn, side.Color())
-		board.Show()
+		board.ShowMarked(chosenmove.getTo())
 		fmt.Println()
 
 		side ^= ColorMask
-        turn++
+		turn++
 
 		fmt.Scanln(&line)
 	}

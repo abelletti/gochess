@@ -39,6 +39,16 @@ var piece = [][]rune{
 	[]rune("K♔♚"),
 }
 
+var pieceval = []int{
+	0,
+	1,
+	3,
+	3,
+	5,
+	9,
+	1000000,
+}
+
 type GetMovesFunc func(*Board, Piece, int, int) *Movelist
 
 var movefunc = map[Piece]GetMovesFunc{
@@ -51,12 +61,12 @@ var movefunc = map[Piece]GetMovesFunc{
 }
 
 type MoveDesc struct {
-	rankstep  int
-	filestep  int
+	rankstep int
+	filestep int
 	longmove bool
 }
 
-var knightmoves = []MoveDesc {
+var knightmoves = []MoveDesc{
 	{2, -1, false},
 	{2, 1, false},
 	{1, 2, false},
@@ -67,31 +77,31 @@ var knightmoves = []MoveDesc {
 	{1, -2, false},
 }
 
-var bishopmoves = []MoveDesc {
-    {1, 1, true},
-    {-1, 1, true},
-    {-1, -1, true},
-    {1, -1, true},
+var bishopmoves = []MoveDesc{
+	{1, 1, true},
+	{-1, 1, true},
+	{-1, -1, true},
+	{1, -1, true},
 }
 
-var rookmoves = []MoveDesc {
-    {1, 0, true},
-    {0, 1, true},
-    {-1, 0, true},
-    {0, -1, true},
+var rookmoves = []MoveDesc{
+	{1, 0, true},
+	{0, 1, true},
+	{-1, 0, true},
+	{0, -1, true},
 }
 
 var queenmoves = append(bishopmoves, rookmoves...)
 
-var kingmoves = []MoveDesc {
-    {1, 0, false},
-    {1, 1, false},
-    {0, 1, false},
-    {-1, 1, false},
-    {-1, 0, false},
-    {-1, -1, false},
-    {0, -1, false},
-    {1, -1, false},
+var kingmoves = []MoveDesc{
+	{1, 0, false},
+	{1, 1, false},
+	{0, 1, false},
+	{-1, 1, false},
+	{-1, 0, false},
+	{-1, -1, false},
+	{0, -1, false},
+	{1, -1, false},
 }
 
 func (p *Piece) Color() string {
@@ -101,6 +111,11 @@ func (p *Piece) Color() string {
 	} else {
 		return "White"
 	}
+}
+
+func (p *Piece) Val() int {
+    kind := *p & KindMask
+    return pieceval[kind]
 }
 
 func (p *Piece) Set(color, kind Piece) {
@@ -115,7 +130,6 @@ func (p *Piece) Name() string {
 		return string(piece[kind][2:3])
 	} else {
 		return string(piece[kind][1:2])
-		//return strings.ToLower(piece[kind])
 	}
 }
 
@@ -226,19 +240,19 @@ func GetKnightMoves(b *Board, side Piece, rank, file int) *Movelist {
 }
 
 func GetBishopMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return GetLongMoves(b, side, rank, file, bishopmoves)
+	return GetLongMoves(b, side, rank, file, bishopmoves)
 }
 
 func GetRookMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return GetLongMoves(b, side, rank, file, rookmoves)
+	return GetLongMoves(b, side, rank, file, rookmoves)
 }
 
 func GetQueenMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return GetLongMoves(b, side, rank, file, queenmoves)
+	return GetLongMoves(b, side, rank, file, queenmoves)
 }
 
 func GetKingMoves(b *Board, side Piece, rank, file int) *Movelist {
-    return GetLongMoves(b, side, rank, file, kingmoves)
+	return GetLongMoves(b, side, rank, file, kingmoves)
 }
 
 func GetLongMoves(b *Board, side Piece, rank, file int, movestyle []MoveDesc) *Movelist {
@@ -249,19 +263,18 @@ func GetLongMoves(b *Board, side Piece, rank, file int, movestyle []MoveDesc) *M
 	from.Set(rank, file)
 
 	for _, movedesc := range movestyle {
-        for distance := 1; distance <= 7; distance++ {
-		    lookr = rank + movedesc.rankstep * distance
-		    lookf = file + movedesc.filestep * distance
-		    if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr, lookf)) {
-			    to.Set(lookr, lookf)
-			    moves.AddPair(from, to)
-		    }
-            if !isValid(lookr, lookf) || !b.isEmpty(lookr, lookf) || !movedesc.longmove {
-                break
-            }
-        }
+		for distance := 1; distance <= 7; distance++ {
+			lookr = rank + movedesc.rankstep*distance
+			lookf = file + movedesc.filestep*distance
+			if isValid(lookr, lookf) && (b.isEnemy(lookr, lookf, side) || b.isEmpty(lookr, lookf)) {
+				to.Set(lookr, lookf)
+				moves.AddPair(from, to)
+			}
+			if !isValid(lookr, lookf) || !b.isEmpty(lookr, lookf) || !movedesc.longmove {
+				break
+			}
+		}
 	}
 
 	return &moves
 }
-

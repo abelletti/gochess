@@ -13,34 +13,35 @@ func (ml *Movelist) Show(title string) {
 		fmt.Println(title + "\n" + strings.Repeat("-", len(title)))
 	}
 	for i := range *ml {
-		fmt.Print([]Move(*ml)[i].Name() + " ")
+		fmt.Print([]Move(*ml)[i].NameVal() + " ")
 	}
 	fmt.Println()
 }
 
 func (ml *Movelist) landsOn(pos Position) bool {
-    for movenum := range (*ml) {
-        if pos == (*ml)[movenum].getTo() {
-            return true
-        }
-    }
-    return false
+	for movenum := range *ml {
+		if pos == (*ml)[movenum].getTo() {
+			return true
+		}
+	}
+	return false
 }
 
 func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
-    var newmoves Movelist
+	var newmoves Movelist
 
-    for movenum := range (*ml) {
-        move := (*ml)[movenum]
-        newb := b.ApplyNew(move)
-        if !newb.isCheck(side) {
+	for movenum := range *ml {
+		move := (*ml)[movenum]
+		newb, capvalue := b.ApplyNew(move)
+		if !newb.isCheck(side) {
+            move.setScore(capvalue)
             newmoves.Add(move)
-        } else {
-            //fmt.Println("Would be moving into CHECK: "+move.Name())
-        }
-    }
+		} else {
+			//fmt.Println("Would be moving into CHECK: "+move.Name())
+		}
+	}
 
-    return newmoves
+	return newmoves
 }
 
 func (ml *Movelist) Add(m Move) {
@@ -66,5 +67,29 @@ func (ml *Movelist) ChooseRandom(side Piece) Move {
 
 func (ml *Movelist) ChooseFirst(side Piece) Move {
 	pick := 0
+	return (*ml)[pick]
+}
+
+func (ml *Movelist) ChooseNoDepth(side Piece) Move {
+	var topscore int
+
+    // identify score of top move(s)
+    for movenum := range *ml {
+        movescore := (*ml)[movenum].getScore()
+        if movescore > topscore {
+            topscore = movescore
+        }
+    }
+
+    // and choose randomly from amongst identical scores
+    var choices []int
+    for movenum := range *ml {
+        if (*ml)[movenum].getScore() == topscore {
+            choices = append(choices, movenum)
+        }
+    }
+    pick := choices[rand.Intn(len(choices))]
+
+    fmt.Printf("Top scoring move worth %d (%d identical)\n", topscore, len(choices))
 	return (*ml)[pick]
 }

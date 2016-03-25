@@ -61,10 +61,23 @@ func (b *Board) isEmptyPos(pos Position) bool {
 }
 
 func (b *Board) Show() {
+    b.ShowMarkedbyRankFile(-1, -1)
+}
+
+func (b *Board) ShowMarked(pos Position) {
+    b.ShowMarkedbyRankFile(pos.getRankFile())
+}
+
+func (b *Board) ShowMarkedbyRankFile(rankmark, filemark int) {
 	for rank := 7; rank >= 0; rank-- {
 		line := strconv.Itoa(rank+1) + "|"
 		for file := 0; file < 8; file++ {
-			line += " " + b[rank][file].Name() + " "
+            if rank == rankmark && file == filemark {
+                line += ">"
+            } else {
+                line += " "
+            }
+			line += b[rank][file].Name() + " "
 		}
 		fmt.Println(line)
 	}
@@ -84,22 +97,22 @@ func (b *Board) isEnemy(rank int, file int, color Piece) bool {
 	return b[rank][file].isColor(color ^ ColorMask)
 }
 
-func (b *Board) ApplyNew(m Move) *Board {
+func (b *Board) ApplyNew(m Move) (*Board, int) {
 	from := m.getFrom()
 	to := m.getTo()
-    newb := *b
+	newb := *b
+    var capvalue int
 
 	piece := newb.GetPos(from)
-	//var capture Piece = Empty
-	//if !newb.isEmptyPos(to) {
-		// add logic to record captured pieces
-		//capture = *(newb.GetPos(to))
-		//fmt.Println(piece.Color() + " would capture: " + (&capture).Name())
-	//}
+	if !newb.isEmptyPos(to) {
+        capture := newb.GetPos(to)
+        capvalue = capture.Val()
+	    //fmt.Println(piece.Color() + " would capture: " + capture.Name())
+	}
 	newb.SetPos(to, *piece)
 	*piece = Empty
 
-    return &newb
+	return &newb, capvalue
 }
 
 func (b *Board) Apply(m Move) {
@@ -134,27 +147,27 @@ func (b *Board) CandidateMoves(side Piece) Movelist {
 }
 
 func (b *Board) isCheck(side Piece) bool {
-    king := b.findKing(side)
-    opponent := side ^ ColorMask
-    //fmt.Println( "Found " + side.Color() + " king at " + king.Name())
-    moves := b.CandidateMoves(opponent)
-    return moves.landsOn(king) 
+	king := b.findKing(side)
+	opponent := side ^ ColorMask
+	//fmt.Println( "Found " + side.Color() + " king at " + king.Name())
+	moves := b.CandidateMoves(opponent)
+	return moves.landsOn(king)
 }
 
 func (b *Board) findKing(side Piece) Position {
-    var pos Position
-    var p Piece
-    p.Set(side, King)
+	var pos Position
+	var p Piece
+	p.Set(side, King)
 
 	for rank := 0; rank < 8; rank++ {
 		for file := 0; file < 8; file++ {
-            if (*b)[rank][file] == p {
-                pos.Set(rank, file)
-                return pos
-            }
-        }
-    }
+			if (*b)[rank][file] == p {
+				pos.Set(rank, file)
+				return pos
+			}
+		}
+	}
 
-    err := "Failed to find " + side.Color() + " king!"
-    panic(err)
+	err := "Failed to find " + side.Color() + " king!"
+	panic(err)
 }
