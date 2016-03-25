@@ -33,6 +33,10 @@ func (ml *Movelist) PruneForCheck(b *Board, side Piece) Movelist {
 		if !newb.isCheck(side) {
             if newb.isCheckMate(*(side.Other())) {
                 capvalue = 1000000
+                move.setScore(capvalue)
+                var matemoves Movelist
+                matemoves.Add(move)
+                return matemoves;  // not much point in alteratives, this is mate
             }
             move.setScore(capvalue)
             newmoves.Add(move)
